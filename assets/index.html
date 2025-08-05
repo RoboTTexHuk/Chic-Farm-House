@@ -124,117 +124,6 @@
             height: 24px;
             margin-bottom: 5px;
         }
-        /* Modal (теперь только для record, add bird - отдельная страница) */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            overflow: hidden; /* Запрет скролла модалки */
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 20px 32px; /* Увеличены отступы слева/справа */
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-            overflow-y: auto; /* Скролл внутри модалки, если контент большой */
-            max-height: 80vh; /* Ограничение высоты для iOS */
-        }
-        .modal-content h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #aaa;
-        }
-        .input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: none;
-            border-radius: 8px;
-            background-color: #fffacd;
-            box-sizing: border-box;
-        }
-        .toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 10px 0;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-        .upload {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px 0;
-        }
-        .upload-icon {
-            font-size: 40px;
-            margin-right: 10px;
-        }
-        .save-button {
-            background-color: #ffd700;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-        }
         /* Tracking Page */
         .select-bird {
             background-color: #fff;
@@ -320,20 +209,6 @@
         .record-details div {
             text-align: center;
         }
-        /* Record Modal */
-        .record-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .record-inputs input {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #fff;
-            box-sizing: border-box;
-        }
         /* Stats Page */
         .stats-content {
             padding: 10px;
@@ -359,14 +234,100 @@
         .icon-secondary {
             fill: #001f3f;
         }
-        /* Add Bird Page */
-        .add-bird-page {
+        /* Add Bird / Add Record Page */
+        .add-page {
             padding: 20px;
         }
         .back-button {
             cursor: pointer;
             font-size: 18px;
             margin-bottom: 10px;
+        }
+        .input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 8px;
+            background-color: #fffacd;
+            box-sizing: border-box;
+        }
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .upload-icon {
+            font-size: 40px;
+            margin-right: 10px;
+        }
+        .save-button {
+            background-color: #ffd700;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .record-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .record-inputs input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #fff;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -399,24 +360,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Record Modal (осталось модалкой) -->
-    <div class="modal" id="recordModal">
-        <div class="modal-content">
-            <span class="close" id="closeRecord">×</span>
-            <h3 id="recordTitle">Add Record</h3>
-            <div class="record-inputs">
-                <input type="text" id="recordDate" placeholder="mm/dd/yyyy">
-                <input type="number" id="recordAge" placeholder="Age">
-                <input type="number" id="recordFeedings" placeholder="Feedings">
-                <input type="number" id="recordWalk" placeholder="Walk h.">
-                <input type="number" id="recordSleep" placeholder="Sleep h.">
-                <input type="number" id="recordHeight" placeholder="Height">
-                <input type="number" id="recordWeight" placeholder="Weight">
-            </div>
-            <button class="save-button" id="saveRecord">Save</button>
-        </div>
-    </div>
-
     <script>
         let birds = [];
         let records = {}; // {birdId: [records]}
@@ -428,17 +371,6 @@
         let editingRecordIndex = null;
 
         const container = document.getElementById('container');
-        const recordModal = document.getElementById('recordModal');
-        const closeRecord = document.getElementById('closeRecord');
-        const recordTitle = document.getElementById('recordTitle');
-        const recordDate = document.getElementById('recordDate');
-        const recordAge = document.getElementById('recordAge');
-        const recordFeedings = document.getElementById('recordFeedings');
-        const recordWalk = document.getElementById('recordWalk');
-        const recordSleep = document.getElementById('recordSleep');
-        const recordHeight = document.getElementById('recordHeight');
-        const recordWeight = document.getElementById('recordWeight');
-        const saveRecord = document.getElementById('saveRecord');
 
         // Global interval for updating timer UI
         setInterval(() => {
@@ -526,7 +458,7 @@
                 container.innerHTML = `
                     <div class="header">Add bird</div>
                     <div class="back-button" id="backToBirds">&larr; Back</div>
-                    <div class="add-bird-page">
+                    <div class="add-page">
                         <input type="text" id="birdName" class="input" placeholder="Name">
                         <textarea id="birdDesc" class="input" placeholder="Species / Description"></textarea>
                         <textarea id="birdFeatures" class="input" placeholder="Features * Optional, e.g. colorful wings, sings in morning"></textarea>
@@ -549,13 +481,13 @@
                     renderPage();
                 });
                 document.getElementById('saveBird').addEventListener('click', () => {
-                    const file = birdPhoto.files[0];
+                    const file = document.getElementById('birdPhoto').files[0];
                     const photoUrl = file ? URL.createObjectURL(file) : '';
                     const newBird = {
                         id: birds.length,
-                        name: birdName.value || 'Unnamed Bird',
-                        desc: birdDesc.value + (birdFeatures.value ? ' ' + birdFeatures.value : ''),
-                        forSale: forSale.checked,
+                        name: document.getElementById('birdName').value || 'Unnamed Bird',
+                        desc: document.getElementById('birdDesc').value + (document.getElementById('birdFeatures').value ? ' ' + document.getElementById('birdFeatures').value : ''),
+                        forSale: document.getElementById('forSale').checked,
                         photo: photoUrl
                     };
                     birds.push(newBird);
@@ -616,7 +548,15 @@
                 `;
                 renderBirdSelect();
                 renderRecords();
-                document.getElementById('addRecordBtn').addEventListener('click', openAddRecordModal);
+                document.getElementById('addRecordBtn').addEventListener('click', () => {
+                    if (currentBirdId == null) {
+                        alert('Please select a bird first.');
+                        return;
+                    }
+                    editingRecordIndex = null;
+                    currentPage = 'addRecord';
+                    renderPage();
+                });
                 const select = document.getElementById('selectBird');
                 select.addEventListener('change', () => {
                     currentBirdId = parseInt(select.value);
@@ -625,7 +565,7 @@
                     updateTimerUI(currentBirdId);
                 });
                 if (birds.length > 0) {
-                    if (currentBirdId === null || !birds.find(b => b.id === currentBirdId)) {
+                    if (currentBirdId == null || !birds.find(b => b.id === currentBirdId)) {
                         currentBirdId = birds[0].id;
                     }
                     select.value = currentBirdId;
@@ -634,6 +574,58 @@
                     updateTimerUI(currentBirdId);
                 }
                 setupTimerListeners();
+            } else if (currentPage === 'addRecord' || currentPage === 'editRecord') {
+                const isEdit = currentPage === 'editRecord';
+                const title = isEdit ? 'Edit Record' : 'Add Record';
+                let rec = {};
+                if (isEdit && editingRecordIndex !== null && records[currentBirdId]) {
+                    rec = records[currentBirdId][editingRecordIndex] || {};
+                }
+                container.innerHTML = `
+                    <div class="header">${title}</div>
+                    <div class="back-button" id="backToTrack">&larr; Back</div>
+                    <div class="add-page">
+                        <div class="record-inputs">
+                            <input type="text" id="recordDate" placeholder="mm/dd/yyyy" value="${rec.date || ''}">
+                            <input type="number" id="recordAge" placeholder="Age" value="${rec.age || ''}">
+                            <input type="number" id="recordFeedings" placeholder="Feedings" value="${rec.feedings || ''}">
+                            <input type="number" id="recordWalk" placeholder="Walk h." value="${rec.walk || ''}">
+                            <input type="number" id="recordSleep" placeholder="Sleep h." value="${rec.sleep || ''}">
+                            <input type="number" id="recordHeight" placeholder="Height" value="${rec.height || ''}">
+                            <input type="number" id="recordWeight" placeholder="Weight" value="${rec.weight || ''}">
+                        </div>
+                        <button class="save-button" id="saveRecord">Save</button>
+                    </div>
+                `;
+                document.getElementById('backToTrack').addEventListener('click', () => {
+                    currentPage = 'track';
+                    renderPage();
+                });
+                document.getElementById('saveRecord').addEventListener('click', () => {
+                    if (currentBirdId == null) {
+                        alert('No bird selected. Please select a bird first.');
+                        return;
+                    }
+                    const newRec = {
+                        date: document.getElementById('recordDate').value || new Date().toISOString().split('T')[0],
+                        age: document.getElementById('recordAge').value || '0',
+                        feedings: document.getElementById('recordFeedings').value || '0',
+                        walk: document.getElementById('recordWalk').value || '0',
+                        sleep: document.getElementById('recordSleep').value || '0',
+                        height: document.getElementById('recordHeight').value || '0',
+                        weight: document.getElementById('recordWeight').value || '0'
+                    };
+                    if (!records[currentBirdId]) records[currentBirdId] = [];
+                    if (isEdit && editingRecordIndex !== null) {
+                        records[currentBirdId][editingRecordIndex] = newRec;
+                        recalculateRecordStats(currentBirdId);
+                    } else {
+                        records[currentBirdId].push(newRec);
+                        updateStats(currentBirdId, newRec);
+                    }
+                    currentPage = 'track';
+                    renderPage();
+                });
             } else if (currentPage === 'stats') {
                 container.innerHTML = `
                     <div class="header">Stats</div>
@@ -648,7 +640,7 @@
                     renderStats();
                 });
                 if (birds.length > 0) {
-                    if (currentBirdId === null || !birds.find(b => b.id === currentBirdId)) {
+                    if (currentBirdId == null || !birds.find(b => b.id === currentBirdId)) {
                         currentBirdId = birds[0].id;
                     }
                     select.value = currentBirdId;
@@ -715,7 +707,7 @@
         function renderRecords() {
             const list = document.getElementById('recordsList');
             list.innerHTML = '';
-            if (!currentBirdId || !records[currentBirdId]) return;
+            if (currentBirdId == null || !records[currentBirdId]) return;
             records[currentBirdId].forEach((rec, index) => {
                 const item = document.createElement('div');
                 item.className = 'record-item';
@@ -734,7 +726,11 @@
                     </div>
                 `;
                 list.appendChild(item);
-                item.querySelector('.edit-icon').addEventListener('click', () => openEditRecordModal(index));
+                item.querySelector('.edit-icon').addEventListener('click', () => {
+                    editingRecordIndex = index;
+                    currentPage = 'editRecord';
+                    renderPage();
+                });
             });
         }
 
@@ -905,64 +901,6 @@
             const sec = remaining % 60;
             display.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
-
-        function openAddRecordModal() {
-            recordTitle.textContent = 'Add Record';
-            recordDate.value = '';
-            recordAge.value = '';
-            recordFeedings.value = '';
-            recordWalk.value = '';
-            recordSleep.value = '';
-            recordHeight.value = '';
-            recordWeight.value = '';
-            editingRecordIndex = null;
-            recordModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Запрет скролла body
-        }
-
-        function openEditRecordModal(index) {
-            recordTitle.textContent = 'Edit Record';
-            const rec = records[currentBirdId][index];
-            recordDate.value = rec.date;
-            recordAge.value = rec.age;
-            recordFeedings.value = rec.feedings;
-            recordWalk.value = rec.walk;
-            recordSleep.value = rec.sleep;
-            recordHeight.value = rec.height;
-            recordWeight.value = rec.weight;
-            editingRecordIndex = index;
-            recordModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Запрет скролла body
-        }
-
-        saveRecord.addEventListener('click', () => {
-            const newRec = {
-                date: recordDate.value || new Date().toISOString().split('T')[0],
-                age: recordAge.value || '0',
-                feedings: recordFeedings.value || '0',
-                walk: recordWalk.value || '0',
-                sleep: recordSleep.value || '0',
-                height: recordHeight.value || '0',
-                weight: recordWeight.value || '0'
-            };
-            if (!records[currentBirdId]) records[currentBirdId] = [];
-            if (editingRecordIndex !== null) {
-                records[currentBirdId][editingRecordIndex] = newRec;
-                recalculateRecordStats(currentBirdId);
-            } else {
-                records[currentBirdId].push(newRec);
-                updateStats(currentBirdId, newRec);
-            }
-            recordModal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Восстановление скролла
-            renderRecords();
-            if (currentPage === 'stats' && currentBirdId !== null) renderStats();
-        });
-
-        closeRecord.addEventListener('click', () => {
-            recordModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        });
 
         // Обработка клавиатуры для iOS (фикс сдвига)
         if (navigator.userAgent.match(/(iPad|iPhone|iPod)/g)) {
