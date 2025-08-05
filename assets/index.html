@@ -1,0 +1,1004 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"> <!-- Улучшена совместимость с iOS клавиатурой -->
+    <title>Birds App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 16px; /* Добавлены отступы слева и справа */
+        }
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #fff;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: #001f3f;
+            color: white;
+            padding: 10px;
+        }
+        .tab {
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tab.active {
+            border-bottom: 2px solid #ffd700;
+        }
+        .add-button {
+            text-align: center;
+            background-color: #001f3f;
+            color: #ffd700;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .bird-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bird-item {
+            background-color: #fffacd;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .bird-photo {
+            width: 60px;
+            height: 60px;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .bird-info {
+            flex: 1;
+        }
+        .bird-name {
+            font-weight: bold;
+        }
+        .bird-desc {
+            font-size: 12px;
+        }
+        .track-button {
+            background-color: #ffd700;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .for-sale {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4500;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: #001f3f;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            bottom: 0;
+        }
+        .nav-item {
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-item.active {
+            font-weight: bold;
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        /* Modal (теперь только для record, add bird - отдельная страница) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden; /* Запрет скролла модалки */
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px 32px; /* Увеличены отступы слева/справа */
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            overflow-y: auto; /* Скролл внутри модалки, если контент большой */
+            max-height: 80vh; /* Ограничение высоты для iOS */
+        }
+        .modal-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #aaa;
+        }
+        .input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 8px;
+            background-color: #fffacd;
+            box-sizing: border-box;
+        }
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .upload-icon {
+            font-size: 40px;
+            margin-right: 10px;
+        }
+        .save-button {
+            background-color: #ffd700;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        /* Tracking Page */
+        .select-bird {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fffacd;
+            height: 44px; /* Увеличена высота селекта */
+            font-size: 16px;
+        }
+        .add-record {
+            text-align: center;
+            background-color: #001f3f;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .timers-section {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .timer {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .timer label {
+            flex: 1;
+        }
+        .timer input {
+            width: 50px;
+            margin-right: 5px;
+        }
+        .timer button {
+            background-color: #ffd700;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .timer span {
+            margin-left: 10px;
+            min-width: 50px;
+        }
+        .records {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .record-item {
+            background-color: #ffd700;
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .edit-icon {
+            cursor: pointer;
+            color: #fff;
+            background-color: #ff4500;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .record-details {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            font-size: 12px;
+        }
+        .record-details div {
+            text-align: center;
+        }
+        /* Record Modal */
+        .record-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .record-inputs input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+        /* Stats Page */
+        .stats-content {
+            padding: 10px;
+        }
+        .stats-content p {
+            margin: 5px 0;
+        }
+        /* Placeholder for other pages */
+        .placeholder {
+            text-align: center;
+            padding: 20px;
+        }
+        /* Responsive */
+        @media (max-width: 600px) {
+            .record-details {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        /* Icons */
+        .icon {
+            fill: #ffd700;
+        }
+        .icon-secondary {
+            fill: #001f3f;
+        }
+        /* Add Bird Page */
+        .add-bird-page {
+            padding: 20px;
+        }
+        .back-button {
+            cursor: pointer;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container"></div>
+    <div class="bottom-nav">
+        <div class="nav-item" data-page="birds">
+            <svg class="nav-icon" viewBox="0 0 100 100">
+                <path d="M 20 80 Q 10 60 20 40 Q 30 20 50 40 Q 70 20 80 40 Q 90 60 80 80 L 50 90 Z" fill="#ffd700"></path>
+                <path d="M 30 50 Q 20 30 40 30 Q 50 10 60 30 Q 80 30 70 50 Z" fill="#001f3f"></path>
+                <circle cx="40" cy="50" r="5" fill="#001f3f"></circle>
+                <path d="M 55 45 L 65 50 L 55 55 Z" fill="#001f3f"></path>
+            </svg>
+            Birds
+        </div>
+        <div class="nav-item" data-page="track">
+            <svg class="nav-icon" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="#ffd700" stroke-width="10" fill="none"></circle>
+                <line x1="70" y1="70" x2="90" y2="90" stroke="#ffd700" stroke-width="10"></line>
+            </svg>
+            Track
+        </div>
+        <div class="nav-item" data-page="stats">
+            <svg class="nav-icon" viewBox="0 0 100 100">
+                <rect x="20" y="60" width="20" height="40" fill="#ffd700"></rect>
+                <rect x="40" y="40" width="20" height="60" fill="#ffd700"></rect>
+                <rect x="60" y="20" width="20" height="80" fill="#ffd700"></rect>
+            </svg>
+            Stats
+        </div>
+    </div>
+
+    <!-- Add/Edit Record Modal (осталось модалкой) -->
+    <div class="modal" id="recordModal">
+        <div class="modal-content">
+            <span class="close" id="closeRecord">×</span>
+            <h3 id="recordTitle">Add Record</h3>
+            <div class="record-inputs">
+                <input type="text" id="recordDate" placeholder="mm/dd/yyyy">
+                <input type="number" id="recordAge" placeholder="Age">
+                <input type="number" id="recordFeedings" placeholder="Feedings">
+                <input type="number" id="recordWalk" placeholder="Walk h.">
+                <input type="number" id="recordSleep" placeholder="Sleep h.">
+                <input type="number" id="recordHeight" placeholder="Height">
+                <input type="number" id="recordWeight" placeholder="Weight">
+            </div>
+            <button class="save-button" id="saveRecord">Save</button>
+        </div>
+    </div>
+
+    <script>
+        let birds = [];
+        let records = {}; // {birdId: [records]}
+        let stats = {}; // {birdId: {avgAge: 0, totalFeedings: 0, totalWalk: 0, totalSleep: 0, avgHeight: 0, avgWeight: 0, totalFeedingTime: 0, totalWalkingTime: 0, totalSleepingTime: 0, recordCount: 0}}
+        let timers = {}; // {birdId: {feeding: {interval: null, remaining: 0, originalMinutes: 0}, walking: {...}, sleeping: {...}}}
+        let currentPage = 'birds';
+        let currentTab = 'All';
+        let currentBirdId = null;
+        let editingRecordIndex = null;
+
+        const container = document.getElementById('container');
+        const recordModal = document.getElementById('recordModal');
+        const closeRecord = document.getElementById('closeRecord');
+        const recordTitle = document.getElementById('recordTitle');
+        const recordDate = document.getElementById('recordDate');
+        const recordAge = document.getElementById('recordAge');
+        const recordFeedings = document.getElementById('recordFeedings');
+        const recordWalk = document.getElementById('recordWalk');
+        const recordSleep = document.getElementById('recordSleep');
+        const recordHeight = document.getElementById('recordHeight');
+        const recordWeight = document.getElementById('recordWeight');
+        const saveRecord = document.getElementById('saveRecord');
+
+        // Global interval for updating timer UI
+        setInterval(() => {
+            if (currentPage === 'track' && currentBirdId !== null) {
+                updateTimerUI(currentBirdId);
+            }
+        }, 1000);
+
+        function updateStats(birdId, newRec = null, isEdit = false) {
+            if (!stats[birdId]) {
+                stats[birdId] = {
+                    avgAge: 0, totalFeedings: 0, totalWalk: 0, totalSleep: 0, avgHeight: 0, avgWeight: 0,
+                    totalFeedingTime: 0, totalWalkingTime: 0, totalSleepingTime: 0, recordCount: 0
+                };
+            }
+            if (newRec) {
+                const s = stats[birdId];
+                if (!isEdit) {
+                    s.recordCount++;
+                }
+                s.totalFeedings += parseFloat(newRec.feedings) || 0;
+                s.totalWalk += parseFloat(newRec.walk) || 0;
+                s.totalSleep += parseFloat(newRec.sleep) || 0;
+                s.avgAge = s.recordCount > 0 ? (s.avgAge * (s.recordCount - 1) + (parseFloat(newRec.age) || 0)) / s.recordCount : 0;
+                s.avgHeight = s.recordCount > 0 ? (s.avgHeight * (s.recordCount - 1) + (parseFloat(newRec.height) || 0)) / s.recordCount : 0;
+                s.avgWeight = s.recordCount > 0 ? (s.avgWeight * (s.recordCount - 1) + (parseFloat(newRec.weight) || 0)) / s.recordCount : 0;
+            }
+        }
+
+        function recalculateRecordStats(birdId) {
+            const s = stats[birdId];
+            if (!s) return;
+            s.avgAge = 0;
+            s.totalFeedings = 0;
+            s.totalWalk = 0;
+            s.totalSleep = 0;
+            s.avgHeight = 0;
+            s.avgWeight = 0;
+            s.recordCount = 0;
+            if (records[birdId]) {
+                records[birdId].forEach(rec => {
+                    updateStats(birdId, rec);
+                });
+            }
+        }
+
+        function addToStats(birdId, type, minutes) {
+            if (!stats[birdId]) updateStats(birdId);
+            const s = stats[birdId];
+            if (type === 'feeding') s.totalFeedingTime += minutes;
+            if (type === 'walking') s.totalWalkingTime += minutes;
+            if (type === 'sleeping') s.totalSleepingTime += minutes;
+            if (currentPage === 'stats' && currentBirdId === birdId) renderStats();
+        }
+
+        function renderPage() {
+            container.innerHTML = '';
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === currentPage);
+            });
+
+            if (currentPage === 'birds') {
+                container.innerHTML = `
+                    <div class="header">Birds</div>
+                    <div class="tabs">
+                        <div class="tab ${currentTab === 'All' ? 'active' : ''}" data-tab="All">All</div>
+                        <div class="tab ${currentTab === 'For Sale' ? 'active' : ''}" data-tab="For Sale">For Sale</div>
+                        <div class="tab ${currentTab === 'Growing' ? 'active' : ''}" data-tab="Growing">Growing</div>
+                    </div>
+                    <div class="add-button" id="addBirdBtn">+ Add bird</div>
+                    <div class="bird-list" id="birdList"></div>
+                `;
+                renderBirdList();
+                document.getElementById('addBirdBtn').addEventListener('click', () => {
+                    currentPage = 'addBird';
+                    renderPage();
+                });
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        currentTab = tab.dataset.tab;
+                        renderPage();
+                    });
+                });
+            } else if (currentPage === 'addBird') {
+                container.innerHTML = `
+                    <div class="header">Add bird</div>
+                    <div class="back-button" id="backToBirds">&larr; Back</div>
+                    <div class="add-bird-page">
+                        <input type="text" id="birdName" class="input" placeholder="Name">
+                        <textarea id="birdDesc" class="input" placeholder="Species / Description"></textarea>
+                        <textarea id="birdFeatures" class="input" placeholder="Features * Optional, e.g. colorful wings, sings in morning"></textarea>
+                        <div class="toggle">
+                            <label>Mark for sale</label>
+                            <label class="switch">
+                                <input type="checkbox" id="forSale">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="upload">
+                            <label for="birdPhoto">Upload photo</label>
+                            <input type="file" id="birdPhoto" accept="image/*" style="display: none;">
+                        </div>
+                        <button class="save-button" id="saveBird">Save</button>
+                    </div>
+                `;
+                document.getElementById('backToBirds').addEventListener('click', () => {
+                    currentPage = 'birds';
+                    renderPage();
+                });
+                document.getElementById('saveBird').addEventListener('click', () => {
+                    const file = birdPhoto.files[0];
+                    const photoUrl = file ? URL.createObjectURL(file) : '';
+                    const newBird = {
+                        id: birds.length,
+                        name: birdName.value || 'Unnamed Bird',
+                        desc: birdDesc.value + (birdFeatures.value ? ' ' + birdFeatures.value : ''),
+                        forSale: forSale.checked,
+                        photo: photoUrl
+                    };
+                    birds.push(newBird);
+                    records[newBird.id] = [];
+                    updateStats(newBird.id);
+                    initTimers(newBird.id);
+                    currentBirdId = newBird.id;
+                    currentPage = 'birds';
+                    renderPage();
+                });
+            } else if (currentPage === 'track') {
+                container.innerHTML = `
+                    <div class="header">Tracking</div>
+                    <div>Select bird:</div>
+                    <select class="dropdown" id="selectBird"></select>
+                    <div class="add-record" id="addRecordBtn">+ Add record</div>
+                    <div class="timers-section">
+                        <h3>Timers</h3>
+                        <div class="timer">
+                            <svg class="nav-icon" viewBox="0 0 100 100" style="margin-right: 10px;">
+                                <path d="M 20 60 L 20 80 L 40 80 L 40 70 Z" fill="#001f3f" />
+                                <circle cx="50" cy="50" r="20" fill="#ffd700" />
+                                <path d="M 60 60 L 60 80 L 80 80 L 80 70 Z" fill="#001f3f" />
+                            </svg>
+                            <label>Feeding Timer (min)</label>
+                            <input type="number" id="feedingMin" value="5" min="1">
+                            <button id="startFeeding">Start</button>
+                            <button id="stopFeeding" disabled>Stop</button>
+                            <span id="feedingCountdown"></span>
+                        </div>
+                        <div class="timer">
+                            <svg class="nav-icon" viewBox="0 0 100 100" style="margin-right: 10px;">
+                                <path d="M 20 20 L 10 50 L 30 50 Z" fill="#ffd700" />
+                                <path d="M 40 20 L 30 50 L 50 50 Z" fill="#001f3f" />
+                            </svg>
+                            <label>Walking Timer (min)</label>
+                            <input type="number" id="walkingMin" value="5" min="1">
+                            <button id="startWalking">Start</button>
+                            <button id="stopWalking" disabled>Stop</button>
+                            <span id="walkingCountdown"></span>
+                        </div>
+                        <div class="timer">
+                            <svg class="nav-icon" viewBox="0 0 100 100" style="margin-right: 10px;">
+                                <circle cx="50" cy="50" r="40" fill="#ffd700" />
+                                <path d="M 50 10 Q 70 30 50 50 Q 30 30 50 10 Z" fill="#001f3f" />
+                                <circle cx="70" cy="30" r="5" fill="#001f3f" />
+                                <circle cx="80" cy="40" r="3" fill="#001f3f" />
+                                <circle cx="60" cy="20" r="4" fill="#001f3f" />
+                            </svg>
+                            <label>Sleeping Timer (min)</label>
+                            <input type="number" id="sleepingMin" value="5" min="1">
+                            <button id="startSleeping">Start</button>
+                            <button id="stopSleeping" disabled>Stop</button>
+                            <span id="sleepingCountdown"></span>
+                        </div>
+                    </div>
+                    <div class="records" id="recordsList"></div>
+                `;
+                renderBirdSelect();
+                renderRecords();
+                document.getElementById('addRecordBtn').addEventListener('click', openAddRecordModal);
+                const select = document.getElementById('selectBird');
+                select.addEventListener('change', () => {
+                    currentBirdId = parseInt(select.value);
+                    renderRecords();
+                    initTimers(currentBirdId);
+                    updateTimerUI(currentBirdId);
+                });
+                if (birds.length > 0) {
+                    if (currentBirdId === null || !birds.find(b => b.id === currentBirdId)) {
+                        currentBirdId = birds[0].id;
+                    }
+                    select.value = currentBirdId;
+                    renderRecords();
+                    initTimers(currentBirdId);
+                    updateTimerUI(currentBirdId);
+                }
+                setupTimerListeners();
+            } else if (currentPage === 'stats') {
+                container.innerHTML = `
+                    <div class="header">Stats</div>
+                    <div>Select bird:</div>
+                    <select class="dropdown" id="selectBirdStats"></select>
+                    <div class="stats-content" id="statsContent"></div>
+                `;
+                renderBirdSelectForStats();
+                const select = document.getElementById('selectBirdStats');
+                select.addEventListener('change', () => {
+                    currentBirdId = parseInt(select.value);
+                    renderStats();
+                });
+                if (birds.length > 0) {
+                    if (currentBirdId === null || !birds.find(b => b.id === currentBirdId)) {
+                        currentBirdId = birds[0].id;
+                    }
+                    select.value = currentBirdId;
+                    updateStats(currentBirdId); // Ensure stats are initialized
+                    renderStats();
+                } else {
+                    document.getElementById('statsContent').innerHTML = '<p>No birds added.</p>';
+                }
+            }
+        }
+
+        function renderBirdList() {
+            const list = document.getElementById('birdList');
+            list.innerHTML = '';
+            let filteredBirds = birds;
+            if (currentTab === 'For Sale') {
+                filteredBirds = birds.filter(b => b.forSale);
+            } else if (currentTab === 'Growing') {
+                filteredBirds = birds.filter(b => !b.forSale);
+            }
+            filteredBirds.forEach(bird => {
+                const item = document.createElement('div');
+                item.className = 'bird-item';
+                item.innerHTML = `
+                    <img src="${bird.photo || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZGRkIi8+PC9zdmc+'}" class="bird-photo">
+                    <div class="bird-info">
+                        <div class="bird-name">${bird.name}</div>
+                        <div class="bird-desc">${bird.desc}</div>
+                    </div>
+                    <button class="track-button" data-id="${bird.id}">Track</button>
+                    ${bird.forSale ? '<div class="for-sale">💰</div>' : ''}
+                `;
+                list.appendChild(item);
+                item.querySelector('.track-button').addEventListener('click', () => {
+                    currentPage = 'track';
+                    currentBirdId = bird.id;
+                    renderPage();
+                });
+            });
+        }
+
+        function renderBirdSelect() {
+            const select = document.getElementById('selectBird');
+            select.innerHTML = '';
+            birds.forEach(bird => {
+                const option = document.createElement('option');
+                option.value = bird.id;
+                option.textContent = bird.name;
+                select.appendChild(option);
+            });
+        }
+
+        function renderBirdSelectForStats() {
+            const select = document.getElementById('selectBirdStats');
+            select.innerHTML = '';
+            birds.forEach(bird => {
+                const option = document.createElement('option');
+                option.value = bird.id;
+                option.textContent = bird.name;
+                select.appendChild(option);
+            });
+        }
+
+        function renderRecords() {
+            const list = document.getElementById('recordsList');
+            list.innerHTML = '';
+            if (!currentBirdId || !records[currentBirdId]) return;
+            records[currentBirdId].forEach((rec, index) => {
+                const item = document.createElement('div');
+                item.className = 'record-item';
+                item.innerHTML = `
+                    <div class="record-header">
+                        <div>${rec.date}</div>
+                        <div class="edit-icon" data-index="${index}">✏️</div>
+                    </div>
+                    <div class="record-details">
+                        <div>Age<br>${rec.age}</div>
+                        <div>Feedings<br>${rec.feedings}</div>
+                        <div>Walk h.<br>${rec.walk}</div>
+                        <div>Sleep h.<br>${rec.sleep}</div>
+                        <div>Height<br>${rec.height}</div>
+                        <div>Weight<br>${rec.weight}</div>
+                    </div>
+                `;
+                list.appendChild(item);
+                item.querySelector('.edit-icon').addEventListener('click', () => openEditRecordModal(index));
+            });
+        }
+
+        function renderStats() {
+            const content = document.getElementById('statsContent');
+            content.innerHTML = '';
+            if (currentBirdId == null) {
+                content.innerHTML = '<p>No bird selected.</p>';
+                return;
+            }
+            if (!stats[currentBirdId]) {
+                updateStats(currentBirdId);
+            }
+            const s = stats[currentBirdId];
+            content.innerHTML = `
+                <p>Average Age: ${s.avgAge.toFixed(2)}</p>
+                <p>Total Feedings: ${s.totalFeedings.toFixed(2)}</p>
+                <p>Total Walk Hours: ${s.totalWalk.toFixed(2)}</p>
+                <p>Total Sleep Hours: ${s.totalSleep.toFixed(2)}</p>
+                <p>Average Height: ${s.avgHeight.toFixed(2)}</p>
+                <p>Average Weight: ${s.avgWeight.toFixed(2)}</p>
+                <p>Total Feeding Timer Minutes: ${s.totalFeedingTime.toFixed(2)}</p>
+                <p>Total Walking Timer Minutes: ${s.totalWalkingTime.toFixed(2)}</p>
+                <p>Total Sleeping Timer Minutes: ${s.totalSleepingTime.toFixed(2)}</p>
+            `;
+        }
+
+        function initTimers(birdId) {
+            if (!timers[birdId]) {
+                timers[birdId] = {
+                    feeding: {interval: null, remaining: 0, originalMinutes: 0},
+                    walking: {interval: null, remaining: 0, originalMinutes: 0},
+                    sleeping: {interval: null, remaining: 0, originalMinutes: 0}
+                };
+            }
+        }
+
+        function setupTimerListeners() {
+            // Feeding
+            const startFeedingBtn = document.getElementById('startFeeding');
+            const stopFeedingBtn = document.getElementById('stopFeeding');
+            if (startFeedingBtn) startFeedingBtn.addEventListener('click', () => {
+                const minutes = parseInt(document.getElementById('feedingMin').value);
+                startTimer(currentBirdId, 'feeding', minutes);
+            });
+            if (stopFeedingBtn) stopFeedingBtn.addEventListener('click', () => {
+                stopTimer(currentBirdId, 'feeding');
+            });
+
+            // Walking
+            const startWalkingBtn = document.getElementById('startWalking');
+            const stopWalkingBtn = document.getElementById('stopWalking');
+            if (startWalkingBtn) startWalkingBtn.addEventListener('click', () => {
+                const minutes = parseInt(document.getElementById('walkingMin').value);
+                startTimer(currentBirdId, 'walking', minutes);
+            });
+            if (stopWalkingBtn) stopWalkingBtn.addEventListener('click', () => {
+                stopTimer(currentBirdId, 'walking');
+            });
+
+            // Sleeping
+            const startSleepingBtn = document.getElementById('startSleeping');
+            const stopSleepingBtn = document.getElementById('stopSleeping');
+            if (startSleepingBtn) startSleepingBtn.addEventListener('click', () => {
+                const minutes = parseInt(document.getElementById('sleepingMin').value);
+                startTimer(currentBirdId, 'sleeping', minutes);
+            });
+            if (stopSleepingBtn) stopSleepingBtn.addEventListener('click', () => {
+                stopTimer(currentBirdId, 'sleeping');
+            });
+        }
+
+        function startTimer(birdId, type, minutes) {
+            initTimers(birdId);
+            const t = timers[birdId][type];
+            if (t.interval) return; // Already running
+            t.originalMinutes = minutes;
+            t.remaining = minutes * 60;
+            t.interval = setInterval(() => {
+                t.remaining--;
+                if (t.remaining <= 0) {
+                    clearInterval(t.interval);
+                    t.interval = null;
+                    addToStats(birdId, type, t.originalMinutes);
+                    t.remaining = 0;
+                    t.originalMinutes = 0; // Reset after completion
+                }
+            }, 1000);
+            updateTimerUI(birdId);
+        }
+
+        function stopTimer(birdId, type) {
+            const t = timers[birdId][type];
+            if (!t.interval) return;
+            clearInterval(t.interval);
+            t.interval = null;
+            const passedSeconds = (t.originalMinutes * 60 - t.remaining);
+            const passedMinutes = passedSeconds / 60;
+            addToStats(birdId, type, passedMinutes);
+            t.remaining = 0;
+            t.originalMinutes = 0; // Reset after stop
+            updateTimerUI(birdId);
+        }
+
+        function updateTimerUI(birdId) {
+            const t = timers[birdId] || {};
+
+            // Feeding
+            const feedingCountdown = document.getElementById('feedingCountdown');
+            const startFeeding = document.getElementById('startFeeding');
+            const stopFeeding = document.getElementById('stopFeeding');
+            if (feedingCountdown) {
+                const ft = t.feeding || {interval: null, remaining: 0, originalMinutes: 0};
+                if (ft.interval && ft.remaining > 0) {
+                    updateTimerDisplay(feedingCountdown, ft.remaining);
+                } else if (ft.remaining <= 0 && ft.originalMinutes > 0) {
+                    feedingCountdown.textContent = 'Done!';
+                } else {
+                    feedingCountdown.textContent = '';
+                }
+            }
+            if (startFeeding && stopFeeding) {
+                startFeeding.disabled = !!(t.feeding && t.feeding.interval);
+                stopFeeding.disabled = !(t.feeding && t.feeding.interval);
+            }
+
+            // Walking
+            const walkingCountdown = document.getElementById('walkingCountdown');
+            const startWalking = document.getElementById('startWalking');
+            const stopWalking = document.getElementById('stopWalking');
+            if (walkingCountdown) {
+                const wt = t.walking || {interval: null, remaining: 0, originalMinutes: 0};
+                if (wt.interval && wt.remaining > 0) {
+                    updateTimerDisplay(walkingCountdown, wt.remaining);
+                } else if (wt.remaining <= 0 && wt.originalMinutes > 0) {
+                    walkingCountdown.textContent = 'Done!';
+                } else {
+                    walkingCountdown.textContent = '';
+                }
+            }
+            if (startWalking && stopWalking) {
+                startWalking.disabled = !!(t.walking && t.walking.interval);
+                stopWalking.disabled = !(t.walking && t.walking.interval);
+            }
+
+            // Sleeping
+            const sleepingCountdown = document.getElementById('sleepingCountdown');
+            const startSleeping = document.getElementById('startSleeping');
+            const stopSleeping = document.getElementById('stopSleeping');
+            if (sleepingCountdown) {
+                const st = t.sleeping || {interval: null, remaining: 0, originalMinutes: 0};
+                if (st.interval && st.remaining > 0) {
+                    updateTimerDisplay(sleepingCountdown, st.remaining);
+                } else if (st.remaining <= 0 && st.originalMinutes > 0) {
+                    sleepingCountdown.textContent = 'Done!';
+                } else {
+                    sleepingCountdown.textContent = '';
+                }
+            }
+            if (startSleeping && stopSleeping) {
+                startSleeping.disabled = !!(t.sleeping && t.sleeping.interval);
+                stopSleeping.disabled = !(t.sleeping && t.sleeping.interval);
+            }
+        }
+
+        function updateTimerDisplay(display, remaining) {
+            const min = Math.floor(remaining / 60);
+            const sec = remaining % 60;
+            display.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function openAddRecordModal() {
+            recordTitle.textContent = 'Add Record';
+            recordDate.value = '';
+            recordAge.value = '';
+            recordFeedings.value = '';
+            recordWalk.value = '';
+            recordSleep.value = '';
+            recordHeight.value = '';
+            recordWeight.value = '';
+            editingRecordIndex = null;
+            recordModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Запрет скролла body
+        }
+
+        function openEditRecordModal(index) {
+            recordTitle.textContent = 'Edit Record';
+            const rec = records[currentBirdId][index];
+            recordDate.value = rec.date;
+            recordAge.value = rec.age;
+            recordFeedings.value = rec.feedings;
+            recordWalk.value = rec.walk;
+            recordSleep.value = rec.sleep;
+            recordHeight.value = rec.height;
+            recordWeight.value = rec.weight;
+            editingRecordIndex = index;
+            recordModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Запрет скролла body
+        }
+
+        saveRecord.addEventListener('click', () => {
+            const newRec = {
+                date: recordDate.value || new Date().toISOString().split('T')[0],
+                age: recordAge.value || '0',
+                feedings: recordFeedings.value || '0',
+                walk: recordWalk.value || '0',
+                sleep: recordSleep.value || '0',
+                height: recordHeight.value || '0',
+                weight: recordWeight.value || '0'
+            };
+            if (!records[currentBirdId]) records[currentBirdId] = [];
+            if (editingRecordIndex !== null) {
+                records[currentBirdId][editingRecordIndex] = newRec;
+                recalculateRecordStats(currentBirdId);
+            } else {
+                records[currentBirdId].push(newRec);
+                updateStats(currentBirdId, newRec);
+            }
+            recordModal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Восстановление скролла
+            renderRecords();
+            if (currentPage === 'stats' && currentBirdId !== null) renderStats();
+        });
+
+        closeRecord.addEventListener('click', () => {
+            recordModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Обработка клавиатуры для iOS (фикс сдвига)
+        if (navigator.userAgent.match(/(iPad|iPhone|iPod)/g)) {
+            let viewportHeight = window.innerHeight;
+            window.addEventListener('resize', () => {
+                const newViewportHeight = window.innerHeight;
+                if (newViewportHeight < viewportHeight) {
+                    // Клавиатура открыта
+                    document.body.style.paddingBottom = `${viewportHeight - newViewportHeight}px`;
+                } else {
+                    // Клавиатура закрыта
+                    document.body.style.paddingBottom = '0';
+                }
+                viewportHeight = newViewportHeight;
+            });
+
+            // Фокус на textarea
+            document.addEventListener('focusin', (event) => {
+                if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT') {
+                    setTimeout(() => {
+                        event.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300); // Задержка для клавиатуры
+                }
+            });
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                currentPage = item.dataset.page;
+                renderPage();
+            });
+        });
+
+        // Initial render
+        renderPage();
+    </script>
+
+
+</body></html>
